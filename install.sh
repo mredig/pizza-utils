@@ -12,7 +12,7 @@ fi
 FULLPATH="$(pwd)/$0"
 DIR=$(dirname "${FULLPATH}")
 
-cd "${DIR}" || echo "Failed cd to `${DIR}`" && exit 1
+cd "${DIR}" || exit 1
 
 for FILE in *; do
 	if [ "$FILE" = "install.sh" ] || [ "$FILE" = "README.md" ] || [ "$FILE" = "remote-install.sh" ]; then
