@@ -2,6 +2,7 @@
 
 set -x
 
-git clone https://gitlab.com/mredig/pizza-utils
+cd /usr/local/src || echo "Can't cd /usr/local/src/" && exit 1
+sudo git clone https://gitlab.com/mredig/pizza-utils
 cd pizza-utils
-./install.sh
+sudo ./install.sh
