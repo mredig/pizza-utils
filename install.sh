@@ -10,7 +10,7 @@ DIR=$(dirname "${FULLPATH}")
 pushd "${DIR}"
 
 for FILE in *; do
-	if [[ "$FILE" == "install.sh" ]]; then
+	if [[ "$FILE" == "install.sh" ]] || [[ "$FILE" == "README.md" ]]; then
 		continue
 	fi
 
