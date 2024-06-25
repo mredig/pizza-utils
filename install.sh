@@ -17,6 +17,7 @@ for FILE in *; do
 		continue
 	fi
 
+	echo "Installing '${FILE}'"
 	chmod +x "${FILE}"
 	sudo ln -fs "${DIR}/${FILE}" "/usr/local/bin/temp/"
 done
