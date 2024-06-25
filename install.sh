@@ -21,5 +21,5 @@ for FILE in *; do
 
 	echo "Installing '${FILE}'"
 	chmod +x "${FILE}"
-	sudo ln -fs "${DIR}/${FILE}" "/usr/local/bin/temp/"
+	sudo ln -fs "${DIR}/${FILE}" "/usr/local/bin/"
 done
