@@ -10,7 +10,7 @@ DIR=$(dirname "${FULLPATH}")
 pushd "${DIR}"
 
 for FILE in *; do
-	if [[ "$FILE" == "install.sh" ]] || [[ "$FILE" == "README.md" ]]; then
+	if [[ "$FILE" == "install.sh" ]] || [[ "$FILE" == "README.md" ]] || [[ "$FILE" == "remote-install.sh" ]]; then
 		continue
 	fi
 
