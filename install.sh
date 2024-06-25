@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -x
+
 echo "About to install pizza-utils. Press enter to continue."
 read NOTHING
 
