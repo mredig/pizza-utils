@@ -6,6 +6,3 @@ alias gc='git commit -m'
 alias gp='git push'
 alias gs='git status'
 " >> ~/.profile
-
-source ~/.profile
-
