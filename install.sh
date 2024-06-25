@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+echo "About to install pizza-utils. Press enter to continue."
+read NOTHING
+
 if ! echo $PATH | grep -q "/usr/local/bin"; then
 	echo "PATH is missing /usr/local/bin. Please add it to the PATH."
 fi
