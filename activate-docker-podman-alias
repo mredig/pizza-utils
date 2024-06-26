@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+# set -x
+
+sudo ln -fs $(which podman) "/usr/local/bin/docker"
