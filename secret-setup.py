@@ -12,7 +12,7 @@ import subprocess
 # change any, run `secret-setup.py -u [secretName]`
 
 def checkIfSecretExists(secretName):
-    command = f"docker secret exists '{secretName}'"
+    command = f"docker secret inspect '{secretName}'"
     result = subprocess.run(command, shell = True, executable="/bin/sh")
     return result.returncode == 0
 
