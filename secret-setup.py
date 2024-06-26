@@ -11,7 +11,6 @@ import subprocess
 # then run `secret-setup.py -s` to initially set up your secrets. If you need to 
 # change any, run `secret-setup.py -u [secretName]`
 
-
 def checkIfSecretExists(secretName):
     command = f"docker secret exists '{secretName}'"
     result = subprocess.run(command, shell = True, executable="/bin/sh")
