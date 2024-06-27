@@ -1,17 +1,7 @@
 #!/usr/bin/env python3
 
-import pathlib
 import argparse
-
-def extractExtensionFrom(filepath):
-	suffix = pathlib.Path(filepath).suffix
-	if suffix.startswith("."):
-		return suffix[1:]
-	else:
-		return suffix
-
-def extractFilenameFrom(filepath):
-	return pathlib.Path(filepath).stem
+from pyutils import pathutils
 
 def main():	
 	parser = argparse.ArgumentParser(description="Extract filename and extension from a path.")
@@ -32,10 +22,10 @@ def main():
 		exit(1)
 
 	if args.filename:
-		print(extractFilenameFrom(args.filepath))
+		print(pathutils.extractFilenameFrom(args.filepath))
 
 	if args.extension:
-		print(extractExtensionFrom(args.filepath))
+		print(pathutils.extractExtensionFrom(args.filepath))
 
 if __name__ == '__main__':
 	main()
