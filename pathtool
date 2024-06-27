@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+
+import pathlib
+import argparse
+
+def extractExtensionFrom(filepath):
+	suffix = pathlib.Path(filepath).suffix
+	if suffix.startswith("."):
+		return suffix[1:]
+	else:
+		return suffix
+
+def extractFilenameFrom(filepath):
+	return pathlib.Path(filepath).stem
+
+def main():	
+	parser = argparse.ArgumentParser(description="Extract filename and extension from a path.")
+
+	parser.add_argument('--filename', "-f", action="store_true", help="Indicates you want the filename only.")
+	parser.add_argument('--extension', "-e", action="store_true", help="Indicates you want the extension only.")
+	parser.add_argument('filepath', help="The path you want to analyze.")
+
+	args = parser.parse_args()
+
+	if args.filename and args.extension:
+		print("You must choose between filename and extension.")
+		parser.print_help()
+		exit(1)
+	elif args.filename == False and args.extension == False:
+		print("You must choose either filename and extension.")
+		parser.print_help()
+		exit(1)
+
+	if args.filename:
+		print(extractFilenameFrom(args.filepath))
+
+	if args.extension:
+		print(extractExtensionFrom(args.filepath))
+
+if __name__ == '__main__':
+	main()
+
