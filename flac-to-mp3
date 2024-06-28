@@ -3,6 +3,7 @@
 import subprocess
 import os
 from pyutils import pathutils
+import argparse
 
 
 def getFlacFiles():
@@ -60,6 +61,17 @@ knownMetaKeys = {
 	"DATE": "--ty",
 	"TRACKNUMBER": "--tn",
 	"GENRE": "--tg",
+	"IMAGE": "--ti",
+}
+
+customMappedKeys = {
+	"BPM": "TBPM",
+	"ISRC": "TSRC",
+	"COMPILATION": "TCMP",
+	"ALBUMARTIST": "TPE2",
+	"COMPOSER": "TCOM",
+	"DISCNUMBER": "TPOS",
+	"ORGANIZATION": "TPUB",
 }
 
 def convertWavToMp3(wavFilePath, mp3DestinationPath, metadata):
@@ -73,8 +85,12 @@ def convertWavToMp3(wavFilePath, mp3DestinationPath, metadata):
 	for key in metadata:
 		option = knownMetaKeys.get(key)
 		if option is None:
+			mappedKey = customMappedKeys.get(key)
 			command.append("--tv")
-			command.append(f"{key}={metadata[key]}")
+			if mappedKey is not None:
+				command.append(f"{mappedKey}={metadata[key]}")
+			else:
+				command.append(f"{key}={metadata[key]}")
 		else:
 			command.append(option)
 			value = metadata[key]
@@ -83,6 +99,8 @@ def convertWavToMp3(wavFilePath, mp3DestinationPath, metadata):
 	command.append(wavFilePath)
 	command.append(mp3DestinationPath)
 
+	print(f"running {command}")
+
 	result = subprocess.run(command, text=True)
 	if result.returncode != 0:
 		print(f"Error transcoding {wavFilePath}")
@@ -90,6 +108,11 @@ def convertWavToMp3(wavFilePath, mp3DestinationPath, metadata):
 	return mp3DestinationPath
 
 def main():
+	parser = argparse.ArgumentParser(description="Uses flac and lame to convert flac files in the current directory to mp3.")
+
+	parser.add_argument("--image", "-i", help="Provide an image for mp3 metadata")
+	args = parser.parse_args()
+
 	flacFiles = getFlacFiles()
 	if len(flacFiles) == 0:
 		print("No flac files. Exiting.")
@@ -104,6 +127,8 @@ def main():
 	for flacFile in flacFiles:
 		tmpWav = convertFlacToWav(flacFile, "tmp")
 		metadata = extractMetadataFromFlacFile(flacFile)
+		if args.image is not None:
+			metadata["IMAGE"] = args.image
 
 		basename = pathutils.extractFilenameFrom(flacFile)
 		convertWavToMp3(tmpWav, f"mp3/{basename}.mp3", metadata)
