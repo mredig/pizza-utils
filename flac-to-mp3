@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+
+import subprocess
+import os
+from pyutils import pathutils
+
+
+def getFlacFiles():
+	flacFiles = [file for file in os.listdir(".") if isFlacFile(file) == True]
+	flacFiles.sort()
+	return flacFiles
+
+def isFlacFile(filename):
+	ext = pathutils.extractExtensionFrom(filename).lower()
+	if ext == "flac":
+		return True
+	else:
+		return False
+
+def convertFlacToWav(flacFilePath, tmpDir):
+	basename = pathutils.extractFilenameFrom(flacFilePath)
+	newPath = f"{tmpDir}/{basename}.wav"
+	command = []
+	command.append("flac")
+	command.append("-d")
+	command.append(flacFilePath)
+	command.append("-o")
+	command.append(newPath)
+
+	print(f"running {command}")
+
+	result = subprocess.run(command, text=True)
+	if result.returncode != 0:
+		print(f"Error transcoding {flacFilePath}")
+		raise 0
+	return newPath
+	# print(result)
+
+def extractMetadataFromFlacFile(flacFilePath):
+	command = []
+	command.append("metaflac")
+	command.append("--export-tags-to=-")
+	command.append(flacFilePath)
+
+	result = subprocess.run(command, capture_output=True, text=True)
+	rawMetadata = result.stdout
+	mdLines = rawMetadata.split("\n")
+	metadata = dict()
+	for line in mdLines:
+		lineSplit = line.split("=")
+		if len(lineSplit) != 2:
+			continue
+		metadata[lineSplit[0]] = lineSplit[1]
+	return metadata
+
+knownMetaKeys = {
+	"TITLE": "--tt",
+	"ARTIST": "--ta",
+	"ALBUM": "--tl",
+	"DATE": "--ty",
+	"TRACKNUMBER": "--tn",
+	"GENRE": "--tg",
+}
+
+def convertWavToMp3(wavFilePath, mp3DestinationPath, metadata):
+	command = []
+	command.append("lame")
+	command.append("-b")
+	command.append("256")
+	command.append("-V")
+	command.append("3")
+
+	for key in metadata:
+		option = knownMetaKeys.get(key)
+		if option is None:
+			command.append("--tv")
+			command.append(f"{key}={metadata[key]}")
+		else:
+			command.append(option)
+			value = metadata[key]
+			command.append(value)
+
+	command.append(wavFilePath)
+	command.append(mp3DestinationPath)
+
+	result = subprocess.run(command, text=True)
+	if result.returncode != 0:
+		print(f"Error transcoding {wavFilePath}")
+		raise 0
+	return mp3DestinationPath
+
+def main():
+	flacFiles = getFlacFiles()
+	if len(flacFiles) == 0:
+		print("No flac files. Exiting.")
+		exit(0)
+
+	try:
+		os.mkdir("mp3")
+		os.mkdir("tmp")
+	except Exception as e:
+		print("Couldn't create mp3s - maybe it already exists")
+
+	for flacFile in flacFiles:
+		tmpWav = convertFlacToWav(flacFile, "tmp")
+		metadata = extractMetadataFromFlacFile(flacFile)
+
+		basename = pathutils.extractFilenameFrom(flacFile)
+		convertWavToMp3(tmpWav, f"mp3/{basename}.mp3", metadata)
+		os.remove(tmpWav)
+
+	os.rmdir("tmp")
+
+main()
+
+
+# --tt <title>    audio/song title (max 30 chars for version 1 tag)
+# --ta <artist>   audio/song artist (max 30 chars for version 1 tag)
+# --tl <album>    audio/song album (max 30 chars for version 1 tag)
+# --ty <year>     audio/song year of issue (1 to 9999)
+# --tc <comment>  user-defined text (max 30 chars for v1 tag, 28 for v1.1)
+# --tn <track[/total]>   audio/song track number and (optionally) the total
+#                        number of tracks on the original recording. (track
+#                        and total each 1 to 255. just the track number
+#                        creates v1.1 tag, providing a total forces v2.0).
+# --tg <genre>    audio/song genre (name or number in list)
+# --ti <file>     audio/song albumArt (jpeg/png/gif file, v2.3 tag)
+# --tv <id=value> user-defined frame specified by id and value (v2.3 tag)
