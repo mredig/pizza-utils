@@ -1,0 +1,67 @@
+#!/usr/bin/env sh
+
+apk update
+apk add podman py3-pip nano
+
+rc-update add cgroups
+rc-service cgroups start
+
+PROFILE_CONTENT='ZXhwb3J0IEVESVRPUj0ibmFubyIKCmFsaWFzIGRvY2tlcj0icG9kbWFuIgphbGlhcyBkYz0iZG9j
+a2VyIGNvbXBvc2UiCgphbGlhcyBncz0iZ2l0IHN0YXR1cyIKYWxpYXMgZ2M9ImdpdCBjb21taXQg
+LW0iCmFsaWFzIGdhPSJnaXQgYWRkIgoKIyBzZXQgYSBmYW5jeSBwcm9tcHQgKG5vbi1jb2xvciwg
+dW5sZXNzIHdlIGtub3cgd2UgIndhbnQiIGNvbG9yKQpjYXNlICIkVEVSTSIgaW4KICAgIHh0ZXJt
+LWNvbG9yfCotMjU2Y29sb3IpIGNvbG9yX3Byb21wdD15ZXM7Owplc2FjCgpISVNUU0laRT0xMDAw
+MDAKSElTVEZJTEVTSVpFPTIwMDAwMAoKIyBzaG93IGdpdCBicmFuY2gKZnVuY3Rpb24gZ2l0QnJh
+bmNoKCkgewoJR19CUkFOQ0g9JChnaXQgYnJhbmNoIC0tbm8tY29sb3IgLS1zaG93LWN1cnJlbnQp
+IDI+IC9kZXYvbnVsbAoJaWYgW1sgJD8gPT0gMCBdXTsgdGhlbgoJCUdfQlJBTkNIPSIgKCR7R19C
+UkFOQ0h9KSIKCWVsc2UKCQlHX0JSQU5DSD0iIgoJZmkKCWVjaG8gIiR7R19CUkFOQ0h9Igp9Cgpp
+ZiBbICIkY29sb3JfcHJvbXB0IiA9IHllcyBdOyB0aGVuCiMgICAgUFMxPScke2RlYmlhbl9jaHJv
+b3Q6KygkZGViaWFuX2Nocm9vdCl9XFtcMDMzWzAxOzMybVxdXHVAXGhcW1wwMzNbMDBtXF06XFtc
+MDMzWzAxOzM0bVxdXHdcW1wwMzNbMDBtXF0gXCQgJyAjb3JpZ2luYWwgKG9yIGNsb3NlIHRvIGl0
+KQogICAgUFMxPSIke2RlYmlhbl9jaHJvb3Q6KygkZGViaWFuX2Nocm9vdCl9XFtcMDMzWzAxOzMy
+bVxdXHVAXGhcW1wwMzNbMDBtXF06XFtcMDMzWzAxOzM0bVxdXHdcW1wwMzNbMDBtXF1cW1wwMzNb
+MzNtXF1cJChnaXRCcmFuY2gpXFtcMDMzWzAwbVxdIFwkICIKZWxzZQogICAgUFMxPScke2RlYmlh
+bl9jaHJvb3Q6KygkZGViaWFuX2Nocm9vdCl9XHVAXGg6XHdcJCAnCmZpCnVuc2V0IGNvbG9yX3By
+b21wdCBmb3JjZV9jb2xvcl9wcm9tcHQKCnNvdXJjZSAvdXNyL3NoYXJlL3BvZG1hbi1jb21wb3Nl
+LWVudi9iaW4vYWN0aXZhdGUK'
+
+echo "$PROFILE_CONTENT" | base64 -d > ~/.profile
+
+addgroup sudo
+
+cp /etc/sudoers /etc/sudoers.bak
+chmod 640 /etc/sudoers
+sed -i 's/# %sudo/%sudo/' /etc/sudoers
+chmod 440 /etc/sudoers
+
+echo "What do you want your non root username to be?"
+read NEW_USER
+adduser "${NEW_USER}"
+adduser "${NEW_USER}" sudo
+
+echo "${NEW_USER}":100000:65536 >/etc/subuid
+echo "${NEW_USER}":100000:65536 >/etc/subgid
+
+newUserProfile="/home/${NEW_USER}/.profile"
+echo "$PROFILE_CONTENT" | base64 -d > "${newUserProfile}"
+chown "${NEW_USER}:${NEW_USER}" "${newUserProfile}"
+
+setup-timezone
+
+mkdir -p /usr/share/podman-compose-env/
+cd /usr/share/podman-compose-env
+python3 -m venv .
+source bin/activate
+pip3 install podman-compose
+
+ln -fs /usr/bin/podman /usr/bin/docker
+
+echo "Do you want to allow unprivileged users access low ports? (starting at 80 and up): [yN]"
+read response
+
+if [ $response == "y" ]; then
+	echo "net.ipv4.ip_unprivileged_port_start = 80" >> /etc/sysctl.conf
+	echo "Updated sysctl.conf for unprivileged access to ports from 80"
+fi
+
+echo "Finished!"
