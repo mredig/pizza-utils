@@ -1,6 +1,17 @@
 #!/usr/bin/env sh
 
+if ! -d "$HOME/.ssh"; then
+	mkdir "$HOME/.ssh"
+	chmod 700 "$HOME/.ssh"
+fi
+
+if [ -e "$HOME/.ssh/authorized_keys" ]; then
+	echo "authorized_keys already exists. Please delete or rename before trying again."
+	exit 1
+fi
+
 echo "What is the github username for the public keys you wish to import?"
 read GH_USER
 
-curl "https://github.com/${GH_USER}.keys"
+curl "https://github.com/${GH_USER}.keys" > "$HOME/.ssh/authorized_keys"
+chmod 600 "$HOME/.ssh/authorized_keys"
