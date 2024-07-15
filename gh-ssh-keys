@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-if ! -d "$HOME/.ssh"; then
+if [ ! -d "$HOME/.ssh" ]; then
 	mkdir "$HOME/.ssh"
 	chmod 700 "$HOME/.ssh"
 fi
