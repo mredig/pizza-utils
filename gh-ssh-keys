@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+echo "What is the github username for the public keys you wish to import?"
+read GH_USER
+
+curl "https://github.com/${GH_USER}.keys"
