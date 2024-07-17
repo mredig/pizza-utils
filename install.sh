@@ -2,8 +2,15 @@
 
 # set -x
 
-echo "About to install pizza-utils. Press enter to continue."
-read NOTHING
+INTERACTIVE=1
+if [ $1 = "-f" ]; then
+	INTERACTIVE=0
+fi
+
+if [ $INTERACTIVE = 1 ]; then
+	echo "About to install pizza-utils. Press enter to continue."
+	read NOTHING
+fi
 
 if ! echo $PATH | grep -q "/usr/local/bin"; then
 	echo "PATH is missing /usr/local/bin. Please add it to the PATH."
@@ -22,5 +29,9 @@ for FILE in *; do
 
 	echo "Installing '${FILE}'"
 	chmod +x "${FILE}"
-	sudo ln -fs "${DIR}/${FILE}" "/usr/local/bin/"
+	if [ $INTERACTIVE = 1 ]; then
+		sudo ln -fs "${DIR}/${FILE}" "/usr/local/bin/"
+	else
+		ln -fs "${DIR}/${FILE}" "/usr/local/bin/"
+	fi
 done

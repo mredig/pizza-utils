@@ -2,6 +2,11 @@
 
 set -x
 
+INTERACTIVE=1
+if [ $1 = "-f" ]; then
+	INTERACTIVE=0
+fi
+
 cd /usr/local/src || exit 1
 
 if ! which git; then
@@ -33,8 +38,18 @@ if ! which git; then
 fi
 
 if [ ! -d pizza-utils ]; then
-	sudo git clone https://gitlab.com/mredig/pizza-utils
+	if [ $INTERACTIVE = 1 ]; then
+		sudo git clone https://gitlab.com/mredig/pizza-utils
+	else
+		git clone https://gitlab.com/mredig/pizza-utils
+	fi
 fi
 cd pizza-utils
-sudo git pull
-sudo ./install.sh
+
+if [ $INTERACTIVE = 1 ]; then
+	sudo git pull
+	sudo ./install.sh
+else
+	git pull
+	./install.sh -f
+fi	
