@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-set -x
-
 INTERACTIVE=1
 if [ "$1" = "-f" ]; then
 	INTERACTIVE=0
