@@ -3,7 +3,7 @@
 # set -x
 
 INTERACTIVE=1
-if [ $1 = "-f" ]; then
+if [ "$1" = "-f" ]; then
 	INTERACTIVE=0
 fi
 
