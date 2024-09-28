@@ -63,12 +63,17 @@ def updateSecret(secretName, toolName):
 	saveSecret(secretName, updatedValue, toolName)
 
 def isToolInstalled(toolName):
-	try:
-		command = ['command', '-v', toolName]
-		result = __runCommand(command, False)
-		return result.returncode == 0
-	except Exception as e:
-		return False
+	tests = [["command", "-v"], ["which"]]
+
+	for test in tests:
+		command = test
+		command.append(toolName)
+		try:
+			result = __runCommand(command, False)
+			return result.returncode == 0
+		except Exception as e:
+			print(f"exception on command {command}: {e}")
+	return False
 
 def getTool(toolName):
 	if isToolInstalled(toolName):
