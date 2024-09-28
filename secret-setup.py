@@ -99,7 +99,7 @@ def __runCommand(command, printOutput=True):
 			print(result.stdout)
 		return result
 	except Exception as e:
-		return CompetedProcess()
+		return CompletedProcess()
 
 def main():
 	parser = argparse.ArgumentParser(description="Setup secrets")
