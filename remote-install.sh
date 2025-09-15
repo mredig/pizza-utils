@@ -5,7 +5,13 @@ if [ "$1" = "-f" ]; then
 	INTERACTIVE=0
 fi
 
-cd /usr/local/src || exit 1
+$SRC_DIR="/usr/local/src"
+if [ ! -d "$SRC_DIR" ]; then
+	mkdir -p "$SRC_DIR"
+	chmod 755 "$SRC_DIR"
+fi
+
+cd "$SRC_DIR" || exit 1
 
 if ! which git; then
 	#install git
@@ -50,4 +56,4 @@ if [ $INTERACTIVE = 1 ]; then
 else
 	git pull
 	./install.sh -f
-fi	
+fi
