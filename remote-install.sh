@@ -5,7 +5,7 @@ if [ "$1" = "-f" ]; then
 	INTERACTIVE=0
 fi
 
-$SRC_DIR="/usr/local/src"
+SRC_DIR="/usr/local/src"
 if [ ! -d "$SRC_DIR" ]; then
 	mkdir -p "$SRC_DIR"
 	chmod 755 "$SRC_DIR"
