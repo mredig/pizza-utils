@@ -23,14 +23,18 @@ jobs:
 
       - name: Create tarball
         run: |
-          tar -czf pizza-utils-${{ steps.version.outputs.VERSION }}.tar.gz \
+          VERSION=${{ steps.version.outputs.VERSION }}
+          mkdir -p /tmp/pizza-release
+          tar -czf /tmp/pizza-release/pizza-utils-${VERSION}.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='install.sh' \
             --exclude='remote-install.sh' \
             --exclude='installDCCommand.sh' \
-            .
-          shasum -a 256 pizza-utils-${{ steps.version.outputs.VERSION }}.tar.gz > pizza-utils-${{ steps.version.outputs.VERSION }}.tar.gz.sha256
+            -C .. \
+            $(basename $GITHUB_WORKSPACE)
+          shasum -a 256 /tmp/pizza-release/pizza-utils-${VERSION}.tar.gz > /tmp/pizza-release/pizza-utils-${VERSION}.tar.gz.sha256
+          mv /tmp/pizza-release/* .
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
