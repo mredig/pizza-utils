@@ -1,5 +1,7 @@
 # Pizza Utils
 
+## Moved to [Github](https://github.com/mredig/pizza-utils)
+
 `git clone` this repo and run `install.sh` as a makeshift, easy to use and manage package manager for useful scripts I've made.
 
 To install, run
