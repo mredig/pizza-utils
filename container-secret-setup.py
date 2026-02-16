@@ -8,8 +8,8 @@ import subprocess
 # assistant to set up secrets in podman or docker.
 #
 # Simply create a file named `secretlist` and put the name of a secret on each line
-# then run `secret-setup.py -s` to initially set up your secrets. If you need to
-# change any, run `secret-setup.py -u [secretName]`
+# then run `container-secret-setup -s` to initially set up your secrets. If you need to
+# change any, run `container-secret-setup -u [secretName]`
 
 def checkIfSecretExists(secretName, toolName):
 	# command = f"docker secret inspect '{secretName}'"
