@@ -8,7 +8,7 @@ import subprocess
 # assistant to set up secrets in podman or docker.
 #
 # Simply create a file named `secretlist` and put the name of a secret on each line
-# then run `secret-setup.py -s` to initially set up your secrets. If you need to 
+# then run `secret-setup.py -s` to initially set up your secrets. If you need to
 # change any, run `secret-setup.py -u [secretName]`
 
 def checkIfSecretExists(secretName, toolName):
@@ -78,7 +78,7 @@ def isToolInstalled(toolName):
 def getTool(toolName):
 	if isToolInstalled(toolName):
 		return toolName
-	
+
 	known = set()
 	known.add("docker")
 	known.add("podman")
@@ -101,11 +101,24 @@ def __runCommand(command, printOutput=True):
 	except Exception as e:
 		return CompletedProcess()
 
+def pickSecret(validSecrets):
+	print("Select a secret to update:")
+	for i, name in enumerate(validSecrets):
+		print(f"  {i + 1}. {name}")
+	while True:
+		try:
+			choice = int(input("Enter number: "))
+			if 1 <= choice <= len(validSecrets):
+				return validSecrets[choice - 1]
+			print(f"Please enter a number between 1 and {len(validSecrets)}.")
+		except ValueError:
+			print("Please enter a valid number.")
+
 def main():
 	parser = argparse.ArgumentParser(description="Setup secrets")
 
 	parser.add_argument('--setup', "-s", action="store_true", help="Setup secrets initially")
-	parser.add_argument('--update', "-u", help="Update provided secret")
+	parser.add_argument('--update', "-u", nargs='?', const='', help="Update a secret by name, or omit value to pick interactively")
 	parser.add_argument('--tool', "-t", default="docker", help="Use this tool to manage secrets (must be docker compatible)")
 
 	validSecrets = []
@@ -122,12 +135,19 @@ def main():
 
 	toolName = getTool(toolName)
 
-	if (args.setup):
+	if args.setup:
 		setupSecrets(validSecrets, toolName)
 		exit(0)
 
-	if args.update is not None and args.update in validSecrets:
-		updateSecret(args.update, toolName)
+	if args.update is not None:
+		if args.update == '':
+			secretName = pickSecret(validSecrets)
+		elif args.update in validSecrets:
+			secretName = args.update
+		else:
+			print(f"Unknown secret '{args.update}'. Valid secrets: {', '.join(validSecrets)}")
+			exit(1)
+		updateSecret(secretName, toolName)
 		exit(0)
 
 	print("You must either specify `-s` or `-u [secretname]`.")
