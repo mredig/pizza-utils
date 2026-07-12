@@ -4,9 +4,9 @@
 
 To install, run
 * noninteractive
-	* `/bin/bash -c "$(curl -fsSL 'https://gitlab.com/mredig/pizza-utils/-/raw/main/remote-install.sh?ref_type=heads')" - -f` 
+	* `/bin/bash -c "$(curl -fsSL 'https://raw.githubusercontent.com/mredig/pizza-utils/refs/heads/main/remote-install.sh')" - -f` 
 * interactive
-	* `/bin/bash -c "$(curl -fsSL 'https://gitlab.com/mredig/pizza-utils/-/raw/main/remote-install.sh?ref_type=heads')"` 
+	* `/bin/bash -c "$(curl -fsSL 'https://raw.githubusercontent.com/mredig/pizza-utils/refs/heads/main/remote-install.sh')"` 
 (assumes you have a compatible `sh` interpretter and common distro)
 
 
